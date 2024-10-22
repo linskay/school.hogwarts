@@ -3,11 +3,12 @@ package ru.hogwarts.school.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.impl.FacultyServiceImpl;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/faculty")
@@ -21,8 +22,7 @@ public class FacultyController {
     }
 
     /**
-     *
-     * @param id идентификатор факультета
+     * @param id      идентификатор факультета
      * @param faculty факультет для поиска
      * @return возвращает id факультета, если найден
      */
@@ -38,7 +38,6 @@ public class FacultyController {
     }
 
     /**
-     *
      * @param faculty факультет для добавления
      * @return возвращает созданный факультет
      */
@@ -47,13 +46,12 @@ public class FacultyController {
     @Operation(summary = "Создает факультет",
             description = "Создает новый факультет",
             responses = @ApiResponse(responseCode = "200", description = "Факультет создан"))
-    public long createFaculty(@RequestBody Faculty faculty) {
+    public Faculty createFaculty(@RequestBody Faculty faculty) {
         return facultyServiceImpl.createFaculty(faculty);
     }
 
     /**
-     *
-     * @param id идентификатор факультета
+     * @param id      идентификатор факультета
      * @param faculty факультет для обновления
      * @return новый факультет
      */
@@ -65,11 +63,10 @@ public class FacultyController {
                     @ApiResponse(responseCode = "200", description = "Факультет найден")})
     public Faculty editFaculty(@PathVariable("id") long id,
                                @RequestBody Faculty faculty) {
-        return facultyServiceImpl.editFaculty(id, faculty);
+        return facultyServiceImpl.editFaculty(faculty);
     }
 
     /**
-     *
      * @param id факультета для удаления
      * @return возвращает удаленный факультет (тип Faculty) или null, если факультет с заданным id не был найден
      */
@@ -79,12 +76,12 @@ public class FacultyController {
             description = "Удаляет факультет по id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет для удаления не найден"),
                     @ApiResponse(responseCode = "200", description = "Факультет удален")})
-    public Faculty deleteFaculty(@PathVariable("id") long id) {
-        return facultyServiceImpl.deleteFaculty(id);
+    public ResponseEntity deleteFaculty(@PathVariable("id") long id) {
+        deleteFaculty(id);
+        return ResponseEntity.ok().build();
     }
 
     /**
-     *
      * @param color цвет, по которому будет поиск для фильтрации. String
      * @return Метод filterByColor возвращает список Faculty (тип List<Faculty>), которые имеют заданный цвет (color)
      */
@@ -94,7 +91,7 @@ public class FacultyController {
             description = "Ищет факультет по цвету, возвращает коллекцию",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
                     @ApiResponse(responseCode = "200", description = "Факультет найден")})
-    public List<Faculty> filterColor(@PathVariable("color") String color) {
+    public Collection<Faculty> filterColor(@PathVariable("color") String color) {
         return facultyServiceImpl.filterByColor(color);
     }
 }
