@@ -6,7 +6,6 @@ import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
@@ -16,7 +15,6 @@ public class FacultyServiceImpl implements FacultyService {
     public FacultyServiceImpl(FacultyRepository facultyRepository) {
         this.facultyRepository = facultyRepository;
     }
-
 
     @Override
     public Faculty createFaculty(Faculty faculty) {
@@ -39,10 +37,8 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public Collection<Faculty> filterByColor(String color) {
-        return findAllFaculty().stream()
-                .filter(faculty -> faculty.getColor().equals(color))
-                .collect(Collectors.toList());
+    public Collection<Faculty> findByColorBetween(String color) {
+        return facultyRepository.findAllByNameContainingIgnoreCase(color);
     }
 
     @Override

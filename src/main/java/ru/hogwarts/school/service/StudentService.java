@@ -13,7 +13,7 @@ public interface StudentService {
 
     void deleteStudent(long id);
 
-    Collection<Student> filterByAge(int age);
+    Collection<Student> findByAgeBetween(int age);
 
     Collection<Student> findAllStudent();
 }

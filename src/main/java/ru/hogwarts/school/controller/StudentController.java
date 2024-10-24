@@ -3,10 +3,12 @@ package ru.hogwarts.school.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.OneToMany;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
-import ru.hogwarts.school.service.impl.StudentServiceImpl;
+import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 
@@ -15,14 +17,16 @@ import java.util.Collection;
 @Tag(name = "Контроллер студентов", description = "Контроллеры для добавления студентов")
 public class StudentController {
 
-    private final StudentServiceImpl studentServiceImpl;
+    private final StudentService studentService;
 
-    public StudentController(StudentServiceImpl studentServiceImpl) {
-        this.studentServiceImpl = studentServiceImpl;
+    @OneToMany(mappedBy = "student")
+    private Faculty faculty;
+
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
     }
 
     /**
-     *
      * @param id идентификатор студента
      * @return возвращает id студента, если найден, иначе null+exception
      */
@@ -33,7 +37,7 @@ public class StudentController {
             responses = {@ApiResponse(responseCode = "404", description = "Студент не найден"),
                     @ApiResponse(responseCode = "200", description = "Студент найден")})
     public Student getFindStudent(@PathVariable long id) {
-        return studentServiceImpl.findStudent(id);
+        return studentService.findStudent(id);
     }
 
     /**
@@ -45,12 +49,11 @@ public class StudentController {
             description = "Добавляет студента и устанавливает id",
             responses = @ApiResponse(responseCode = "200", description = "Студент добавлен"))
     public Student createStudent(@RequestBody Student student) {
-        return studentServiceImpl.createStudent(student);
+        return studentService.createStudent(student);
     }
 
     /**
-     *
-     * @param id идентификатор студента
+     * @param id      идентификатор студента
      * @param student студент для обновления
      * @return возвращает нового студента
      */
@@ -61,11 +64,10 @@ public class StudentController {
                     @ApiResponse(responseCode = "200", description = "Студент найден")})
     public Student editStudent(@PathVariable("id") long id,
                                @RequestBody Student student) {
-        return studentServiceImpl.editStudent(student);
+        return studentService.editStudent(student);
     }
 
     /**
-     *
      * @param id идентификатор студента
      * @return возвращает удаленного студента или null, если студент с заданным id не был найден
      */
@@ -75,7 +77,7 @@ public class StudentController {
                     @ApiResponse(responseCode = "200", description = "Студент удален")})
 
     public ResponseEntity deleteStudent(@PathVariable("id") long id) {
-        studentServiceImpl.deleteStudent(id);
+        studentService.deleteStudent(id);
         return ResponseEntity.ok().build();
     }
 
@@ -88,7 +90,7 @@ public class StudentController {
             description = "Поиск по студентам указанного возраста",
             responses = @ApiResponse(responseCode = "200", description = "Коллекция сформирована"))
     public Collection<Student> getStudentsByAge(@PathVariable("age") int age) {
-        return studentServiceImpl.filterByAge(age);
+        return studentService.findByAgeBetween(age);
     }
 }
 

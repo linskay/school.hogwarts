@@ -1,8 +1,6 @@
 package ru.hogwarts.school.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Objects;
 
@@ -10,11 +8,15 @@ import java.util.Objects;
 public class Student {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
     private int age;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Faculty faculty;
 
     public Student(Long id, int age, String name) {
         this.id = id;

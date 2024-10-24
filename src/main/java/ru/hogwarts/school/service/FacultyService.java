@@ -13,7 +13,7 @@ public interface FacultyService {
 
     Faculty editFaculty(Faculty faculty);
 
-    Collection<Faculty> filterByColor(String color);
+    Collection<Faculty> findByColorBetween(String color);
 
     Collection<Faculty> findAllFaculty();
 }

@@ -3,10 +3,13 @@ package ru.hogwarts.school.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.service.impl.FacultyServiceImpl;
+import ru.hogwarts.school.service.FacultyService;
+import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 
@@ -15,10 +18,10 @@ import java.util.Collection;
 @Tag(name = "Контроллер факультетов", description = "Контроллеры для добавления факультетов")
 public class FacultyController {
 
-    private final FacultyServiceImpl facultyServiceImpl;
+    private final FacultyService facultyService;
 
-    public FacultyController(FacultyServiceImpl facultyServiceImpl) {
-        this.facultyServiceImpl = facultyServiceImpl;
+    public FacultyController(FacultyService facultyService) {
+        this.facultyService = facultyService;
     }
 
     /**
@@ -33,7 +36,7 @@ public class FacultyController {
                     @ApiResponse(responseCode = "200", description = "Факультет найден")})
     public long getFindFaculty(@PathVariable long id,
                                @RequestBody Faculty faculty) {
-        return facultyServiceImpl.findFaculty(id).getId();
+        return facultyService.findFaculty(id).getId();
 
     }
 
@@ -47,7 +50,7 @@ public class FacultyController {
             description = "Создает новый факультет",
             responses = @ApiResponse(responseCode = "200", description = "Факультет создан"))
     public Faculty createFaculty(@RequestBody Faculty faculty) {
-        return facultyServiceImpl.createFaculty(faculty);
+        return facultyService.createFaculty(faculty);
     }
 
     /**
@@ -63,7 +66,7 @@ public class FacultyController {
                     @ApiResponse(responseCode = "200", description = "Факультет найден")})
     public Faculty editFaculty(@PathVariable("id") long id,
                                @RequestBody Faculty faculty) {
-        return facultyServiceImpl.editFaculty(faculty);
+        return facultyService.editFaculty(faculty);
     }
 
     /**
@@ -83,7 +86,7 @@ public class FacultyController {
 
     /**
      * @param color цвет, по которому будет поиск для фильтрации. String
-     * @return Метод filterByColor возвращает список Faculty (тип List<Faculty>), которые имеют заданный цвет (color)
+     * @return Метод filterByColor возвращает список Faculty (тип Collection<Faculty>), которые имеют заданный цвет (color)
      */
 
     @GetMapping("/color")
@@ -92,6 +95,6 @@ public class FacultyController {
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
                     @ApiResponse(responseCode = "200", description = "Факультет найден")})
     public Collection<Faculty> filterColor(@PathVariable("color") String color) {
-        return facultyServiceImpl.filterByColor(color);
+        return facultyService.findByColorBetween(color);
     }
 }
