@@ -92,5 +92,9 @@ public class StudentController {
     public Collection<Student> getStudentsByAge(@PathVariable("age") int age) {
         return studentService.findByAgeBetween(age);
     }
-}
 
+    @GetMapping("/{id}/faculty-by-student")
+    public Faculty getFacultyByStudentId(@PathVariable Long id) {
+        return studentService.getFacultyByStudentId(id);
+    }
+}

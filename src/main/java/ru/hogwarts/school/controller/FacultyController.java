@@ -8,6 +8,7 @@ import jakarta.persistence.ManyToOne;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 import ru.hogwarts.school.service.StudentService;
 
@@ -96,5 +97,20 @@ public class FacultyController {
                     @ApiResponse(responseCode = "200", description = "Факультет найден")})
     public Collection<Faculty> filterColor(@PathVariable("color") String color) {
         return facultyService.findByColorBetween(color);
+    }
+
+    /**
+     *
+     * @param id принимает индентификатор факультета
+     * @return возвращает список студентов факультета
+     */
+
+    @GetMapping("/{id}/students-faculty")
+    @Operation(summary = "Ищет по факультету",
+            description = "Ищет студентов по идентификатору факультета, возвращает коллекцию выбранного факультета",
+            responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
+                    @ApiResponse(responseCode = "200", description = "Факультет найден")})
+    public Collection<Student> getStudentsByFaculty(@PathVariable Long id) {
+        return facultyService.getStudentsByFaculty(id);
     }
 }
