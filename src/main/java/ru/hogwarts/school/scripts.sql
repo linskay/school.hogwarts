@@ -1,6 +1,3 @@
-package
-ru.hogwarts.school;
-
 select *
 from student;
 select *

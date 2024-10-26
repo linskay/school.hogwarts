@@ -15,13 +15,16 @@ public class Student {
     private int age;
 
     @ManyToOne
-    @JoinColumn(name = "student_id")
+    @JoinColumn(name = "faculty_id")
     private Faculty faculty;
 
     public Student(Long id, int age, String name) {
         this.id = id;
         this.age = age;
         this.name = name;
+    }
+
+    public Student() {
     }
 
     public Long getId() {
@@ -46,6 +49,14 @@ public class Student {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Faculty getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
     }
 
     @Override

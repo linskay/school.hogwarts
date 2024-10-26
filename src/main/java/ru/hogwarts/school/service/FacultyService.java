@@ -6,9 +6,10 @@ import ru.hogwarts.school.model.Student;
 import java.util.Collection;
 
 public interface FacultyService {
+
     Faculty createFaculty(Faculty faculty);
 
-    Faculty findFaculty(long id);
+    Faculty findFaculty(Long id);
 
     void deleteFaculty(long id);
 

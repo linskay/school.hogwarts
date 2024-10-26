@@ -93,6 +93,11 @@ public class StudentController {
         return studentService.findByAgeBetween(age);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}/faculty-by-student")
     public Faculty getFacultyByStudentId(@PathVariable Long id) {
         return studentService.getFacultyByStudentId(id);

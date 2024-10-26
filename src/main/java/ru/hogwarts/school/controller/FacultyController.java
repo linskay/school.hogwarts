@@ -86,6 +86,7 @@ public class FacultyController {
     }
 
     /**
+     *
      * @param color цвет, по которому будет поиск для фильтрации. String
      * @return Метод filterByColor возвращает список Faculty (тип Collection<Faculty>), которые имеют заданный цвет (color)
      */

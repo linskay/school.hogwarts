@@ -18,11 +18,13 @@ public class Faculty {
     @OneToMany(mappedBy = "faculty")
     private Collection<Student> students;
 
-
     public Faculty(Long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
+    }
+
+    public Faculty() {
     }
 
     public Long getId() {
