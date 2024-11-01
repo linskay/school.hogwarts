@@ -1,12 +1,10 @@
 package ru.hogwarts.school.model;
 
 import jakarta.persistence.*;
-import org.springframework.data.annotation.Id;
 
 @Entity
 public class Avatar {
 
-    @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,10 +19,6 @@ public class Avatar {
     @OneToOne
     @JoinColumn(name = "student_id")
     private Student student;
-
-    public Student getStudent() {
-        return student;
-    }
 
     public void setStudent(Student student) {
         this.student = student;
@@ -48,6 +42,26 @@ public class Avatar {
 
     public void setFileSize(long size) {
         this.fileSize = size;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public Student getStudent() {
+        return student;
     }
 
     public Long getId() {
