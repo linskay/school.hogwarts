@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.OneToMany;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
@@ -18,9 +19,6 @@ import java.util.Collection;
 public class StudentController {
 
     private final StudentService studentService;
-
-    @OneToMany(mappedBy = "student")
-    private Faculty faculty;
 
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
@@ -71,7 +69,7 @@ public class StudentController {
      * @param id идентификатор студента
      * @return возвращает удаленного студента или null, если студент с заданным id не был найден
      */
-    @DeleteMapping("{id}/deleteFaculty")
+    @DeleteMapping("{id}/delete-student")
     @Operation(summary = "Удаляет студента",
             responses = {@ApiResponse(responseCode = "404", description = "Студент не найден"),
                     @ApiResponse(responseCode = "200", description = "Студент удален")})
@@ -82,19 +80,20 @@ public class StudentController {
     }
 
     /**
-     * @param age параметр возраст студента
+     * @param minAge параметр мин возраста студента
+     * @param maxAge параметр макс возраста студента
      * @return возвращает коллекцию по указанному возрасту
      */
-    @GetMapping("{age}/by-age")
+
+    @GetMapping("/by-age")
     @Operation(summary = "Поиск по студентам",
             description = "Поиск по студентам указанного возраста",
             responses = @ApiResponse(responseCode = "200", description = "Коллекция сформирована"))
-    public Collection<Student> getStudentsByAge(@PathVariable("age") int age) {
-        return studentService.findByAgeBetween(age);
+    public Collection<Student> getStudentsByAge(@RequestParam int minAge, @RequestParam int maxAge) {
+        return studentService.findByAgeBetween(minAge, maxAge);
     }
 
     /**
-     *
      * @param id
      * @return
      */

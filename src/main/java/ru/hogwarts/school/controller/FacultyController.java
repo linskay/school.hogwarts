@@ -3,14 +3,11 @@ package ru.hogwarts.school.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
-import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 
@@ -26,19 +23,16 @@ public class FacultyController {
     }
 
     /**
-     * @param id      идентификатор факультета
-     * @param faculty факультет для поиска
-     * @return возвращает id факультета, если найден
+     * @param id идентификатор факультета
+     * @return возвращает факультет, если найден
      */
     @GetMapping("{id}/find-faculty")
     @Operation(summary = "Ищет факультет",
             description = "Ищет факультет по id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
                     @ApiResponse(responseCode = "200", description = "Факультет найден")})
-    public long getFindFaculty(@PathVariable long id,
-                               @RequestBody Faculty faculty) {
-        return facultyService.findFaculty(id).getId();
-
+    public Faculty getFindFaculty(@PathVariable long id) {
+        return facultyService.findFaculty(id);
     }
 
     /**
@@ -86,7 +80,6 @@ public class FacultyController {
     }
 
     /**
-     *
      * @param color цвет, по которому будет поиск для фильтрации. String
      * @return Метод filterByColor возвращает список Faculty (тип Collection<Faculty>), которые имеют заданный цвет (color)
      */
@@ -101,7 +94,6 @@ public class FacultyController {
     }
 
     /**
-     *
      * @param id принимает индентификатор факультета
      * @return возвращает список студентов факультета
      */

@@ -18,6 +18,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import static ru.hogwarts.school.service.TestConstants.TEST_STUDENT;
+import static ru.hogwarts.school.service.TestConstants.TEST_STUDENT_2;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceImplTest {
@@ -34,7 +36,7 @@ class StudentServiceImplTest {
     @Test
     @DisplayName("Создание студента")
     void createStudent() {
-        Student student = TestConstants.TEST_STUDENT;
+        Student student = TEST_STUDENT;
 
         when(studentRepository.save(student)).thenReturn(student);
 
@@ -47,7 +49,7 @@ class StudentServiceImplTest {
     @Test
     @DisplayName("Поиск студента по ID")
     void findStudent() {
-        Student student = TestConstants.TEST_STUDENT;
+        Student student = TEST_STUDENT;
 
         when(studentRepository.getById(student.getId())).thenReturn(student);
 
@@ -60,7 +62,7 @@ class StudentServiceImplTest {
     @Test
     @DisplayName("Редактирование студента")
     void editStudent() {
-        Student student = TestConstants.TEST_STUDENT;
+        Student student = TEST_STUDENT;
 
         when(studentRepository.save(student)).thenReturn(student);
 
@@ -73,7 +75,7 @@ class StudentServiceImplTest {
     @Test
     @DisplayName("Удаление студента")
     void deleteStudent() {
-        long studentId = TestConstants.TEST_STUDENT.getId();
+        long studentId = TEST_STUDENT.getId();
 
         studentService.deleteStudent(studentId);
 
@@ -83,26 +85,26 @@ class StudentServiceImplTest {
     @Test
     @DisplayName("Поиск студентов по возрасту")
     void findByAgeBetween() {
-        int age = TestConstants.TEST_STUDENT.getAge();
+        int minAge = 20;
+        int maxAge = 22;
         List<Student> students = List.of(
-                TestConstants.TEST_STUDENT,
-                TestConstants.TEST_STUDENT_2
+                TEST_STUDENT,
+                TEST_STUDENT_2
         );
 
-        when(studentRepository.findByAgeBetween(age)).thenReturn(students);
+        when(studentRepository.findByAgeBetween(minAge, maxAge)).thenReturn(students);
 
-        Collection<Student> foundStudents = studentService.findByAgeBetween(age);
+        Collection<Student> foundStudents = studentService.findByAgeBetween(minAge, maxAge);
 
         assertThat(foundStudents).containsExactlyInAnyOrderElementsOf(students);
-        verify(studentRepository, times(1)).findByAgeBetween(age);
     }
 
     @Test
     @DisplayName("Получение всех студентов")
     void findAllStudent() {
         List<Student> students = List.of(
-                TestConstants.TEST_STUDENT,
-                TestConstants.TEST_STUDENT_2
+                TEST_STUDENT,
+                TEST_STUDENT_2
         );
 
         when(studentRepository.findAll()).thenReturn(students);
@@ -116,16 +118,16 @@ class StudentServiceImplTest {
     @Test
     @DisplayName("Получение факультета по ID студента")
     void getFacultyByStudentId() {
-        long studentId = TestConstants.TEST_STUDENT.getId();
+        long studentId = TEST_STUDENT.getId();
         Faculty faculty = TestConstants.TEST_FACULTY;
 
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(TestConstants.TEST_STUDENT));
-        when(facultyRepository.findAllById(studentId)).thenReturn(faculty);
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(TEST_STUDENT));
+        when(facultyRepository.findById(studentId)).thenReturn(Optional.of(faculty));
 
         Faculty foundFaculty = studentService.getFacultyByStudentId(studentId);
 
         assertThat(foundFaculty).isEqualTo(faculty);
         verify(studentRepository, times(1)).findById(studentId);
-        verify(facultyRepository, times(1)).findAllById(studentId);
+        verify(facultyRepository, times(1)).findById(studentId);
     }
 }

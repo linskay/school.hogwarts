@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.hogwarts.school.exception.FacultyNotFoundException;
+import ru.hogwarts.school.exception.NotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.FacultyRepository;
@@ -88,7 +88,7 @@ class FacultyServiceImplTest {
         when(facultyRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> facultyService.findFaculty(1L))
-                .isInstanceOf(FacultyNotFoundException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("Факультет не найден с этим ID: [%s]".formatted(TEST_FACULTY.getId()));
     }
 
@@ -110,7 +110,7 @@ class FacultyServiceImplTest {
         when(facultyRepository.existsById(TEST_FACULTY.getId())).thenReturn(false);
 
         assertThatThrownBy(() -> facultyService.deleteFaculty(TEST_FACULTY.getId()))
-                .isInstanceOf(FacultyNotFoundException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("Факультет не найден с этим ID: [%s]".formatted(TEST_FACULTY.getId()));
 
         verify(facultyRepository, never().description("Удаление выполнено(когда не должно быть)")).deleteById(TEST_FACULTY.getId());
@@ -137,8 +137,8 @@ class FacultyServiceImplTest {
         when(facultyRepository.existsById(TEST_FACULTY.getId())).thenReturn(false);
 
         assertThatThrownBy(() -> facultyService.editFaculty(TEST_FACULTY))
-                .isInstanceOf(FacultyNotFoundException.class)
-                .hasMessage("Факультет не найден с этим ID: [%s]".formatted(TEST_FACULTY.getId()));
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("%s not found with ID: [%s]".formatted(Faculty.class.getSimpleName(), TEST_FACULTY.getId()));
 
         verify(facultyRepository, never().description("Перезапись данных выполнена(когда не должно быть)")).save(TEST_FACULTY);
     }
@@ -173,7 +173,7 @@ class FacultyServiceImplTest {
     @DisplayName("Поиск факультетов по цвету")
     void findByColorBetween() {
 
-        when(facultyRepository.findAllByNameContainingIgnoreCase(TEST_FACULTY.getColor())).thenReturn(Collections.singletonList(TEST_FACULTY));
+        when(facultyRepository.findByColorContainingIgnoreCase(TEST_FACULTY.getColor())).thenReturn(Collections.singletonList(TEST_FACULTY));
 
         Collection<Faculty> faculties = facultyService.findByColorBetween(TEST_FACULTY.getColor());
 
