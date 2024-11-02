@@ -1,6 +1,5 @@
 package ru.hogwarts.school.service.impl;
 
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.NotFoundException;
 import ru.hogwarts.school.model.Faculty;
@@ -13,13 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final FacultyRepository facultyRepository;
 
     public StudentServiceImpl(StudentRepository studentRepository, FacultyRepository facultyRepository) {
         this.studentRepository = studentRepository;
+        this.facultyRepository = facultyRepository;
     }
 
     @Override
@@ -29,7 +29,8 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student findStudent(long id) {
-        return studentRepository.getById(id);
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Student.class, id));
     }
 
     @Override
@@ -62,5 +63,22 @@ public class StudentServiceImpl implements StudentService {
         Optional<Student> student = studentRepository.findById(id);
         return student.map(Student::getFaculty)
                 .orElseThrow(() -> new NotFoundException(Student.class, id));
+    }
+
+    @Override
+    public Student assignFacultyToStudent(Long studentId, Long facultyId) {
+        Optional<Student> student = studentRepository.findById(studentId);
+        Optional<Faculty> faculty = facultyRepository.findById(facultyId);
+
+        if (student.isPresent() && faculty.isPresent()) {
+            student.get().setFaculty(faculty.get());
+            return studentRepository.save(student.get());
+        } else {
+            try {
+                throw new ClassNotFoundException("Студент или факультет не найден");
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@ package ru.hogwarts.school.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
@@ -9,24 +10,33 @@ import java.util.Objects;
 @Table(name = "student")
 public class Student {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
     private Long id;
 
     private String name;
     private int age;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ManyToOne
     @JoinColumn(name = "faculty_id")
     private Faculty faculty;
 
-    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
     private Avatar avatar;
 
-    public Student(int age, String name) {
+    public Student(int age, String name, Faculty faculty, Avatar avatar) {
         this.age = age;
         this.name = name;
+        this.faculty = faculty;
+        this.avatar = avatar;
+    }
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
     }
 
     public Student() {

@@ -41,15 +41,19 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty editFaculty(Faculty faculty) {
-        facultyRepository.findById(faculty.getId())
-                .orElseThrow(() -> new NotFoundException(Faculty.class, faculty.getId()));
-        return facultyRepository.save(faculty);
+        long id = faculty.getId();
+        Faculty existingFaculty = facultyRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Faculty.class, id));
+        existingFaculty.setName(faculty.getName());
+        existingFaculty.setColor(faculty.getColor());
+        return facultyRepository.save(existingFaculty);
     }
 
     @Override
-    public List<Faculty> findByColorBetween(String color) {
-        return facultyRepository.findByColorContainingIgnoreCase(color); // Изменено
+    public List<Faculty> findByColor(String color) {
+        return facultyRepository.findByColorContainingIgnoreCase(color);
     }
+
 
     @Override
     public List<Faculty> findAllFaculty() {

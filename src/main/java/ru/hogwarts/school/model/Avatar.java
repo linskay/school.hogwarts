@@ -3,29 +3,38 @@ package ru.hogwarts.school.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "avatar")
 public class Avatar {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     private String filePath;
     private long fileSize;
+
     private String mediaType;
 
     @Lob
     private byte[] data;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
 
-    public void setStudent(Student student) {
+    public Avatar(String filePath, long fileSize, String mediaType, byte[] data, Student student) {
+        this.filePath = filePath;
+        this.fileSize = fileSize;
+        this.mediaType = mediaType;
+        this.data = data;
         this.student = student;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Avatar() {
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
     public void setData(byte[] bytes) {
@@ -62,6 +71,10 @@ public class Avatar {
 
     public Student getStudent() {
         return student;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getId() {

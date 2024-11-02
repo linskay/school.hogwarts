@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,13 +72,14 @@ class StudentServiceImplTest {
     @Test
     @DisplayName("Поиск студента по ID")
     void findStudent() {
-        when(studentRepository.getById(TEST_STUDENT_1.getId())).thenReturn(TEST_STUDENT_1);
+        when(studentRepository.findById(TEST_STUDENT_1.getId())).thenReturn(Optional.of(TEST_STUDENT_1)); // Используем findById
 
         Student foundStudent = studentService.findStudent(TEST_STUDENT_1.getId());
 
         assertThat(foundStudent).isNotNull();
         assertThat(foundStudent).isEqualTo(TEST_STUDENT_1);
     }
+
 
     @Test
     @DisplayName("Редактирование существующего студента")
@@ -162,5 +164,21 @@ class StudentServiceImplTest {
         assertThatThrownBy(() -> studentService.getFacultyByStudentId(TEST_STUDENT_1.getId()))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Student not found with ID: [%s]".formatted(TEST_STUDENT_1.getId()));
+    }
+
+    @Test
+    @DisplayName("Назначение факультета студенту - успешное")
+    void assignFacultyToStudent_Success() {
+
+        when(studentRepository.findById(TEST_STUDENT_1.getId())).thenReturn(Optional.of(TEST_STUDENT_1));
+        when(facultyRepository.findById(TEST_FACULTY.getId())).thenReturn(Optional.of(TEST_FACULTY));
+        when(studentRepository.save(any(Student.class))).thenReturn(TEST_STUDENT_1);
+
+        Student result = studentService.assignFacultyToStudent(TEST_STUDENT_1.getId(), TEST_FACULTY.getId());
+
+        assertThat(result).isEqualTo(TEST_STUDENT_1);
+        verify(studentRepository, times(1)).findById(TEST_STUDENT_1.getId());
+        verify(facultyRepository, times(1)).findById(TEST_FACULTY.getId());
+        verify(studentRepository, times(1)).save(any(Student.class));
     }
 }

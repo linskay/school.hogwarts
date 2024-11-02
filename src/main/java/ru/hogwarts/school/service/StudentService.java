@@ -19,4 +19,6 @@ public interface StudentService {
     Collection<Student> findAllStudent();
 
     Faculty getFacultyByStudentId(Long studentId);
+
+    Student assignFacultyToStudent(Long studentId, Long facultyId);
 }

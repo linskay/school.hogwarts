@@ -24,23 +24,25 @@ public class AvatarServiceImpl implements AvatarService {
     @Value("${path.to.avatars.folder}")
     private String avatarsDir;
 
-    private final StudentRepository studentRepository;
     private final AvatarRepository avatarRepository;
+    private final StudentRepository studentRepository;
 
-    public AvatarServiceImpl(StudentRepository studentRepository, AvatarRepository avatarRepository) {
-        this.studentRepository = studentRepository;
+    public AvatarServiceImpl(AvatarRepository avatarRepository, StudentRepository studentRepository) {
         this.avatarRepository = avatarRepository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
     public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new NotFoundException(Student.class, studentId));
+        Student student = studentRepository.getById(studentId);
 
-        Path filePath = Path.of(avatarsDir, studentId + "." + getExtensions(avatarFile.getOriginalFilename()));
+        Avatar avatar = student.getAvatar();
+        if (avatar == null) {
+            avatar = new Avatar();
+        }
+        Path filePath = Path.of(avatarsDir, student + "." + getExtensions(avatarFile.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
-
         try (
                 InputStream is = avatarFile.getInputStream();
                 OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
@@ -49,18 +51,11 @@ public class AvatarServiceImpl implements AvatarService {
         ) {
             bis.transferTo(bos);
         }
-
-        Avatar avatar = findAvatar(studentId);
-        if (avatar == null) {
-            avatar = new Avatar();
-            avatar.setStudent(student);
-        }
-
+        avatar.setStudent(student);
         avatar.setFilePath(filePath.toString());
         avatar.setFileSize(avatarFile.getSize());
         avatar.setMediaType(avatarFile.getContentType());
         avatar.setData(avatarFile.getBytes());
-
         avatarRepository.save(avatar);
     }
 
@@ -68,7 +63,13 @@ public class AvatarServiceImpl implements AvatarService {
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
-    private Avatar findAvatar(Long studentId) {
-        return avatarRepository.findByStudentId(studentId).orElse(null);
+    @Override
+    public Avatar findAvatar(Long studentId) {
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new NotFoundException(Student.class, studentId));
+        if (student.getAvatar() != null) {
+            return student.getAvatar();
+        } else {
+            return null;
+        }
     }
 }

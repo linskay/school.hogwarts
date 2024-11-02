@@ -159,7 +159,7 @@ class FacultyServiceImplTest {
     void findByColorBetween() {
         when(facultyRepository.findByColorContainingIgnoreCase("Black")).thenReturn(Collections.singletonList(TEST_FACULTY_1));
 
-        List<Faculty> faculties = facultyService.findByColorBetween("Black");
+        List<Faculty> faculties = facultyService.findByColor("Black");
 
         assertThat(faculties)
                 .describedAs("Список факультетов не пустой")
