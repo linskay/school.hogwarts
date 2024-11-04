@@ -1,27 +1,42 @@
 package ru.hogwarts.school.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
 @Entity
+@Table(name = "student")
 public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
     private Long id;
 
     private String name;
     private int age;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ManyToOne
     @JoinColumn(name = "faculty_id")
     private Faculty faculty;
 
-    public Student(Long id, int age, String name) {
-        this.id = id;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
+    private Avatar avatar;
+
+    public Student(int age, String name, Faculty faculty, Avatar avatar) {
         this.age = age;
         this.name = name;
+        this.faculty = faculty;
+        this.avatar = avatar;
+    }
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
     }
 
     public Student() {
@@ -57,6 +72,14 @@ public class Student {
 
     public void setFaculty(Faculty faculty) {
         this.faculty = faculty;
+    }
+
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
     }
 
     @Override

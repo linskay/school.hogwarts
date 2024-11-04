@@ -3,14 +3,11 @@ package ru.hogwarts.school.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
-import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 
@@ -26,19 +23,17 @@ public class FacultyController {
     }
 
     /**
-     * @param id      идентификатор факультета
-     * @param faculty факультет для поиска
+     * @param id идентификатор факультета
      * @return возвращает id факультета, если найден
      */
     @GetMapping("{id}/find-faculty")
     @Operation(summary = "Ищет факультет",
             description = "Ищет факультет по id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
-                    @ApiResponse(responseCode = "200", description = "Факультет найден")})
-    public long getFindFaculty(@PathVariable long id,
-                               @RequestBody Faculty faculty) {
-        return facultyService.findFaculty(id).getId();
-
+                    @ApiResponse(responseCode = "200", description = "Факультет найден")
+    })
+    public Faculty getFindFaculty(@PathVariable long id) {
+        return facultyService.findFaculty(id);
     }
 
     /**
@@ -55,7 +50,7 @@ public class FacultyController {
     }
 
     /**
-     * @param id      идентификатор факультета
+     * @param id идентификатор факультета
      * @param faculty факультет для обновления
      * @return новый факультет
      */
@@ -64,9 +59,11 @@ public class FacultyController {
     @Operation(summary = "Обновляет факультет",
             description = "Обновляет факультет и устанавливает id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
-                    @ApiResponse(responseCode = "200", description = "Факультет найден")})
+                    @ApiResponse(responseCode = "200", description = "Факультет найден")
+    })
     public Faculty editFaculty(@PathVariable("id") long id,
                                @RequestBody Faculty faculty) {
+        faculty.setId(id);
         return facultyService.editFaculty(faculty);
     }
 
@@ -79,14 +76,14 @@ public class FacultyController {
     @Operation(summary = "Удаляет факультет",
             description = "Удаляет факультет по id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет для удаления не найден"),
-                    @ApiResponse(responseCode = "200", description = "Факультет удален")})
+                    @ApiResponse(responseCode = "204", description = "Факультет удален")
+    })
     public ResponseEntity deleteFaculty(@PathVariable("id") long id) {
         deleteFaculty(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     /**
-     *
      * @param color цвет, по которому будет поиск для фильтрации. String
      * @return Метод filterByColor возвращает список Faculty (тип Collection<Faculty>), которые имеют заданный цвет (color)
      */
@@ -95,14 +92,14 @@ public class FacultyController {
     @Operation(summary = "Ищет по цвету",
             description = "Ищет факультет по цвету, возвращает коллекцию",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
-                    @ApiResponse(responseCode = "200", description = "Факультет найден")})
-    public Collection<Faculty> filterColor(@PathVariable("color") String color) {
-        return facultyService.findByColorBetween(color);
+                    @ApiResponse(responseCode = "200", description = "Факультет найден")
+    })
+    public Collection<Faculty> filterColor(@RequestParam("color") String color) {
+        return facultyService.findByColor(color);
     }
 
     /**
-     *
-     * @param id принимает индентификатор факультета
+     * @param id принимает идентификатор факультета
      * @return возвращает список студентов факультета
      */
 
@@ -110,7 +107,8 @@ public class FacultyController {
     @Operation(summary = "Ищет по факультету",
             description = "Ищет студентов по идентификатору факультета, возвращает коллекцию выбранного факультета",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
-                    @ApiResponse(responseCode = "200", description = "Факультет найден")})
+                    @ApiResponse(responseCode = "200", description = "Факультет найден")
+    })
     public Collection<Student> getStudentsByFaculty(@PathVariable Long id) {
         return facultyService.getStudentsByFaculty(id);
     }

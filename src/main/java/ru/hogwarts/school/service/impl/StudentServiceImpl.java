@@ -1,13 +1,14 @@
 package ru.hogwarts.school.service.impl;
 
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exception.NotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,32 +29,56 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student findStudent(long id) {
-        return studentRepository.getById(id);
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Student.class, id));
     }
 
     @Override
     public Student editStudent(Student student) {
+        if (!studentRepository.existsById(student.getId())) {
+            throw new NotFoundException(Student.class, student.getId());
+        }
         return studentRepository.save(student);
     }
 
     @Override
     public void deleteStudent(long id) {
-        studentRepository.deleteById(id);
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Student.class, id));
+        studentRepository.deleteById(student.getId());
     }
 
     @Override
-    public Collection<Student> findByAgeBetween(int age) {
-        return studentRepository.findByAgeBetween(age);
+    public List<Student> findByAgeBetween(int minAge, int maxAge) {
+        return studentRepository.findByAgeBetween(minAge, maxAge);
     }
 
     @Override
-    public Collection<Student> findAllStudent() {
+    public List<Student> findAllStudent() {
         return studentRepository.findAll();
     }
 
     @Override
-    public Faculty getFacultyByStudentId(Long studentId) {
+    public Faculty getFacultyByStudentId(Long id) {
+        Optional<Student> student = studentRepository.findById(id);
+        return student.map(Student::getFaculty)
+                .orElseThrow(() -> new NotFoundException(Student.class, id));
+    }
+
+    @Override
+    public Student assignFacultyToStudent(Long studentId, Long facultyId) {
         Optional<Student> student = studentRepository.findById(studentId);
-        return facultyRepository.findAllById(studentId);
+        Optional<Faculty> faculty = facultyRepository.findById(facultyId);
+
+        if (student.isPresent() && faculty.isPresent()) {
+            student.get().setFaculty(faculty.get());
+            return studentRepository.save(student.get());
+        } else {
+            try {
+                throw new ClassNotFoundException("Студент или факультет не найден");
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

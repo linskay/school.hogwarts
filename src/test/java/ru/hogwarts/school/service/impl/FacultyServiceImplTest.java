@@ -7,177 +7,207 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.hogwarts.school.exception.FacultyNotFoundException;
+import ru.hogwarts.school.exception.NotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public
 class FacultyServiceImplTest {
 
     @Mock
-    FacultyRepository facultyRepository;
+    private FacultyRepository facultyRepository;
+
     @Mock
-    StudentRepository studentRepository;
+    private StudentRepository studentRepository;
 
     @InjectMocks
-    FacultyServiceImpl facultyService;
+    private FacultyServiceImpl facultyService;
 
-    private Faculty TEST_FACULTY;
-    private Faculty TEST_FACULTY2;
-
-    private Student TEST_STUDENT;
-    private Student TEST_STUDENT2;
+    private Faculty TEST_FACULTY_1;
+    private Faculty TEST_FACULTY_2;
+    private Student TEST_STUDENT_1;
+    private Student TEST_STUDENT_2;
 
     @BeforeEach
     void setUp() {
-        TEST_FACULTY = new Faculty();
-        TEST_FACULTY.setId(1L);
-        TEST_FACULTY.setName("Java");
-        TEST_FACULTY.setColor("Black");
+        TEST_FACULTY_1 = new Faculty();
+        TEST_FACULTY_1.setId(1L);
+        TEST_FACULTY_1.setName("Java");
+        TEST_FACULTY_1.setColor("Black");
 
-        TEST_FACULTY2 = new Faculty();
-        TEST_FACULTY2.setId(2L);
-        TEST_FACULTY2.setName("Python");
-        TEST_FACULTY2.setColor("Brawn");
+        TEST_FACULTY_2 = new Faculty();
+        TEST_FACULTY_2.setId(2L);
+        TEST_FACULTY_2.setName("C++");
+        TEST_FACULTY_2.setColor("Brown");
 
-        TEST_STUDENT = new Student();
-        TEST_STUDENT.setId(1L);
-        TEST_STUDENT.setName("Duck");
-        TEST_STUDENT.setAge(15);
-        TEST_STUDENT.setFaculty(TEST_FACULTY);
+        TEST_STUDENT_1 = new Student();
+        TEST_STUDENT_1.setId(1L);
+        TEST_STUDENT_1.setName("Oleg");
+        TEST_STUDENT_1.setAge(20);
+        TEST_STUDENT_1.setFaculty(TEST_FACULTY_1);
 
-        TEST_STUDENT2 = new Student();
-        TEST_STUDENT2.setId(2L);
-        TEST_STUDENT2.setName("Goose");
-        TEST_STUDENT2.setAge(18);
-        TEST_STUDENT2.setFaculty(TEST_FACULTY);
+        TEST_STUDENT_2 = new Student();
+        TEST_STUDENT_2.setId(2L);
+        TEST_STUDENT_2.setName("Gennadiy");
+        TEST_STUDENT_2.setAge(22);
+        TEST_STUDENT_2.setFaculty(TEST_FACULTY_1);
     }
 
     @Test
     @DisplayName("Создание факультета")
     void createFaculty() {
+        when(facultyRepository.save(TEST_FACULTY_1)).thenReturn(TEST_FACULTY_1);
 
-        when(facultyRepository.save(TEST_FACULTY)).thenReturn(TEST_FACULTY);
+        Faculty createdFaculty = facultyService.createFaculty(TEST_FACULTY_1);
 
-        Faculty savedFaculty = facultyService.createFaculty(TEST_FACULTY);
-
-        when(facultyRepository.findById(TEST_FACULTY.getId())).thenReturn(Optional.of(TEST_FACULTY));
-
-        Faculty actual = facultyService.findFaculty(savedFaculty.getId());
-
-        assertThat(actual).withFailMessage("Факультет = null").isNotNull();
-        assertThat(actual).withFailMessage("Значение != ожидаемому").isEqualTo(savedFaculty);
+        assertThat(createdFaculty)
+                .describedAs("Созданный факультет не null")
+                .isNotNull();
+        assertThat(createdFaculty)
+                .describedAs("Созданный факультет совпадает с ожидаемым")
+                .isEqualTo(TEST_FACULTY_1);
     }
 
     @Test
-    @DisplayName("Поиск несуществующего факультета")
+    @DisplayName("Поиск факультета по ID")
+    void findFaculty() {
+        when(facultyRepository.findById(TEST_FACULTY_1.getId())).thenReturn(Optional.of(TEST_FACULTY_1));
+
+        Faculty foundFaculty = facultyService.findFaculty(TEST_FACULTY_1.getId());
+
+        assertThat(foundFaculty)
+                .describedAs("Найденный факультет не null")
+                .isNotNull();
+        assertThat(foundFaculty)
+                .describedAs("Найденный факультет совпадает с ожидаемым")
+                .isEqualTo(TEST_FACULTY_1);
+    }
+
+    @Test
+    @DisplayName("Поиск несуществующего факультета по ID")
     void findFacultyNotFound() {
+        when(facultyRepository.findById(TEST_FACULTY_1.getId())).thenReturn(Optional.empty());
 
-        when(facultyRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> facultyService.findFaculty(1L))
-                .isInstanceOf(FacultyNotFoundException.class)
-                .hasMessage("Факультет не найден с этим ID: [%s]".formatted(TEST_FACULTY.getId()));
+        assertThatThrownBy(() -> facultyService.findFaculty(TEST_FACULTY_1.getId()))
+                .describedAs("Должно быть выброшено исключение NotFoundException")
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Faculty not found with ID: [%s]".formatted(TEST_FACULTY_1.getId()));
     }
 
     @Test
     @DisplayName("Удаление существующего факультета")
     void deleteFaculty() {
+        when(facultyRepository.findById(TEST_FACULTY_1.getId())).thenReturn(Optional.of(TEST_FACULTY_1));
 
-        when(facultyRepository.existsById(TEST_FACULTY.getId())).thenReturn(true);
+        facultyService.deleteFaculty(TEST_FACULTY_1.getId());
 
-        facultyService.deleteFaculty(TEST_FACULTY.getId());
-
-        verify(facultyRepository, times(1)).deleteById(TEST_FACULTY.getId());
+        verify(facultyRepository, times(1))
+                .deleteById(TEST_FACULTY_1.getId());
     }
 
     @Test
     @DisplayName("Удаление несуществующего факультета")
     void deleteFacultyNotFound() {
+        when(facultyRepository.findById(TEST_FACULTY_1.getId())).thenReturn(Optional.empty());
 
-        when(facultyRepository.existsById(TEST_FACULTY.getId())).thenReturn(false);
-
-        assertThatThrownBy(() -> facultyService.deleteFaculty(TEST_FACULTY.getId()))
-                .isInstanceOf(FacultyNotFoundException.class)
-                .hasMessage("Факультет не найден с этим ID: [%s]".formatted(TEST_FACULTY.getId()));
-
-        verify(facultyRepository, never().description("Удаление выполнено(когда не должно быть)")).deleteById(TEST_FACULTY.getId());
+        assertThatThrownBy(() -> facultyService.deleteFaculty(TEST_FACULTY_1.getId()))
+                .describedAs("Должно быть выброшено исключение NotFoundException")
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Faculty not found with ID: [%s]".formatted(TEST_FACULTY_1.getId()));
     }
 
     @Test
     @DisplayName("Редактирование существующего факультета")
     void editFaculty() {
+        when(facultyRepository.findById(TEST_FACULTY_1.getId())).thenReturn(Optional.of(TEST_FACULTY_1));
+        when(facultyRepository.save(TEST_FACULTY_1)).thenReturn(TEST_FACULTY_1);
 
-        when(facultyRepository.existsById(TEST_FACULTY.getId())).thenReturn(true);
+        Faculty editedFaculty = facultyService.editFaculty(TEST_FACULTY_1);
 
-        when(facultyRepository.save(TEST_FACULTY)).thenReturn(TEST_FACULTY);
-
-        Faculty editedFaculty = facultyService.editFaculty(TEST_FACULTY);
-
-        assertThat(editedFaculty).withFailMessage("Факультет = null").isNotNull();
-        assertThat(editedFaculty).withFailMessage("Значение != ожидаемому").isEqualTo(TEST_FACULTY);
+        assertThat(editedFaculty)
+                .describedAs("Отредактированный факультет не null")
+                .isNotNull();
+        assertThat(editedFaculty)
+                .describedAs("Отредактированный факультет совпадает с ожидаемым")
+                .isEqualTo(TEST_FACULTY_1);
     }
 
     @Test
     @DisplayName("Редактирование несуществующего факультета")
     void editFacultyNotFound() {
+        when(facultyRepository.findById(TEST_FACULTY_1.getId())).thenReturn(Optional.empty());
 
-        when(facultyRepository.existsById(TEST_FACULTY.getId())).thenReturn(false);
-
-        assertThatThrownBy(() -> facultyService.editFaculty(TEST_FACULTY))
-                .isInstanceOf(FacultyNotFoundException.class)
-                .hasMessage("Факультет не найден с этим ID: [%s]".formatted(TEST_FACULTY.getId()));
-
-        verify(facultyRepository, never().description("Перезапись данных выполнена(когда не должно быть)")).save(TEST_FACULTY);
-    }
-
-    @Test
-    @DisplayName("Получение студентов по факультету")
-    void getStudentsByFaculty() {
-
-        when(facultyRepository.findById(TEST_FACULTY.getId())).thenReturn(Optional.of(TEST_FACULTY));
-
-        when(studentRepository.findAllByFaculty(TEST_FACULTY)).thenReturn(Arrays.asList(TEST_STUDENT, TEST_STUDENT2));
-
-        Collection<Student> students = facultyService.getStudentsByFaculty(TEST_FACULTY.getId());
-
-        assertThat(students).withFailMessage("Результат пустой").isNotEmpty();
-        assertThat(students).withFailMessage("Результат не содержит ожидаемых результатов").containsExactlyInAnyOrder(TEST_STUDENT, TEST_STUDENT2);
-    }
-
-    @Test
-    @DisplayName("Получение всех факультетов")
-    void findAllFaculty() {
-
-        when(facultyRepository.findAll()).thenReturn(Arrays.asList(TEST_FACULTY, TEST_FACULTY2));
-
-        Collection<Faculty> faculties = facultyService.findAllFaculty();
-
-        assertThat(faculties).withFailMessage("Результат пустой").isNotEmpty();
-        assertThat(faculties).withFailMessage("Результат не содержит ожидаемых результатов").containsExactlyInAnyOrder(TEST_FACULTY, TEST_FACULTY2);
+        assertThatThrownBy(() -> facultyService.editFaculty(TEST_FACULTY_1))
+                .describedAs("Должно быть выброшено исключение NotFoundException")
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Faculty not found with ID: [%s]".formatted(TEST_FACULTY_1.getId()));
     }
 
     @Test
     @DisplayName("Поиск факультетов по цвету")
     void findByColorBetween() {
+        when(facultyRepository.findByColorContainingIgnoreCase("Black")).thenReturn(Collections.singletonList(TEST_FACULTY_1));
 
-        when(facultyRepository.findAllByNameContainingIgnoreCase(TEST_FACULTY.getColor())).thenReturn(Collections.singletonList(TEST_FACULTY));
+        List<Faculty> faculties = facultyService.findByColor("Black");
 
-        Collection<Faculty> faculties = facultyService.findByColorBetween(TEST_FACULTY.getColor());
+        assertThat(faculties)
+                .describedAs("Список факультетов не пустой")
+                .isNotEmpty();
+        assertThat(faculties)
+                .describedAs("Список факультетов должен содержать ожидаемый факультет")
+                .containsExactly(TEST_FACULTY_1);
+    }
 
-        assertThat(faculties).withFailMessage("Результат пустой").isNotEmpty();
-        assertThat(faculties).withFailMessage("Результат не содержит ожидаемых результатов").containsExactly(TEST_FACULTY);
+    @Test
+    @DisplayName("Получение всех факультетов")
+    void findAllFaculty() {
+        when(facultyRepository.findAll()).thenReturn(Arrays.asList(TEST_FACULTY_1, TEST_FACULTY_2));
+
+        List<Faculty> faculties = facultyService.findAllFaculty();
+
+        assertThat(faculties)
+                .describedAs("Список факультетов не должен быть пустым")
+                .isNotEmpty();
+        assertThat(faculties)
+                .describedAs("Список факультетов должен содержать ожидаемые факультеты")
+                .containsExactlyInAnyOrder(TEST_FACULTY_1, TEST_FACULTY_2);
+    }
+
+    @Test
+    @DisplayName("Получение студентов по факультету")
+    void getStudentsByFaculty() {
+        when(facultyRepository.findById(TEST_FACULTY_1.getId())).thenReturn(Optional.of(TEST_FACULTY_1));
+        when(studentRepository.findAllByFaculty(TEST_FACULTY_1)).thenReturn(Arrays.asList(TEST_STUDENT_1, TEST_STUDENT_2));
+
+        List<Student> students = facultyService.getStudentsByFaculty(TEST_FACULTY_1.getId());
+
+        assertThat(students)
+                .describedAs("Список студентов не должен быть пустым")
+                .isNotEmpty();
+        assertThat(students)
+                .describedAs("Список студентов должен содержать ожидаемых студентов")
+                .containsExactlyInAnyOrder(TEST_STUDENT_1, TEST_STUDENT_2);
+    }
+
+    @Test
+    @DisplayName("Получение студентов по несуществующему факультету")
+    void getStudentsByFacultyNotFound() {
+        when(facultyRepository.findById(TEST_FACULTY_1.getId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> facultyService.getStudentsByFaculty(TEST_FACULTY_1.getId()))
+                .describedAs("Должно быть выброшено исключение NotFoundException")
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Faculty not found with ID: [%s]".formatted(TEST_FACULTY_1.getId()));
     }
 }

@@ -24,5 +24,14 @@ public class AppConfig {
                 .group("student")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi getAvatarGroup() {
+        return GroupedOpenApi.builder()
+                .displayName("avatar")
+                .pathsToMatch("/avatar/**")
+                .group("avatar")
+                .build();
+    }
 }
 

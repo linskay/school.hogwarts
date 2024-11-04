@@ -4,6 +4,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface FacultyService {
 
@@ -15,7 +16,7 @@ public interface FacultyService {
 
     Faculty editFaculty(Faculty faculty);
 
-    Collection<Faculty> findByColorBetween(String color);
+    List<Faculty> findByColor(String color);
 
     Collection<Faculty> findAllFaculty();
 
