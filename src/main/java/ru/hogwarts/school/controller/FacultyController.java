@@ -31,7 +31,7 @@ public class FacultyController {
             description = "Ищет факультет по id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
                     @ApiResponse(responseCode = "200", description = "Факультет найден")
-    })
+            })
     public Faculty getFindFaculty(@PathVariable long id) {
         return facultyService.findFaculty(id);
     }
@@ -50,7 +50,7 @@ public class FacultyController {
     }
 
     /**
-     * @param id идентификатор факультета
+     * @param id      идентификатор факультета
      * @param faculty факультет для обновления
      * @return новый факультет
      */
@@ -60,7 +60,7 @@ public class FacultyController {
             description = "Обновляет факультет и устанавливает id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
                     @ApiResponse(responseCode = "200", description = "Факультет найден")
-    })
+            })
     public Faculty editFaculty(@PathVariable("id") long id,
                                @RequestBody Faculty faculty) {
         faculty.setId(id);
@@ -77,9 +77,9 @@ public class FacultyController {
             description = "Удаляет факультет по id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет для удаления не найден"),
                     @ApiResponse(responseCode = "204", description = "Факультет удален")
-    })
+            })
     public ResponseEntity deleteFaculty(@PathVariable("id") long id) {
-        deleteFaculty(id);
+        facultyService.deleteFaculty(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -93,7 +93,7 @@ public class FacultyController {
             description = "Ищет факультет по цвету, возвращает коллекцию",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
                     @ApiResponse(responseCode = "200", description = "Факультет найден")
-    })
+            })
     public Collection<Faculty> filterColor(@RequestParam("color") String color) {
         return facultyService.findByColor(color);
     }
@@ -108,7 +108,7 @@ public class FacultyController {
             description = "Ищет студентов по идентификатору факультета, возвращает коллекцию выбранного факультета",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет не найден"),
                     @ApiResponse(responseCode = "200", description = "Факультет найден")
-    })
+            })
     public Collection<Student> getStudentsByFaculty(@PathVariable Long id) {
         return facultyService.getStudentsByFaculty(id);
     }
