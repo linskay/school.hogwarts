@@ -77,9 +77,9 @@ public class FacultyController {
             description = "Удаляет факультет по id",
             responses = {@ApiResponse(responseCode = "404", description = "Факультет для удаления не найден"),
                     @ApiResponse(responseCode = "204", description = "Факультет удален")
-    })
+            })
     public ResponseEntity deleteFaculty(@PathVariable("id") long id) {
-        deleteFaculty(id);
+        facultyService.deleteFaculty(id);
         return ResponseEntity.noContent().build();
     }
 
