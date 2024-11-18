@@ -1,9 +1,14 @@
 package ru.hogwarts.school.service.impl;
 
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.NotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.model.StudentProjection;
 import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.repositories.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
@@ -80,5 +85,22 @@ public class StudentServiceImpl implements StudentService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public long countAllStudents() {
+        return studentRepository.countAllStudents();
+    }
+
+    @Override
+    public Double getAverageAge() {
+        return studentRepository.getAverageAge();
+    }
+
+    @Transactional
+    @Override
+    public Page<StudentProjection> findLastFiveStudents() {
+        Pageable pageable = PageRequest.of(0, 5);
+        return studentRepository.findLastFiveStudents(pageable);
     }
 }

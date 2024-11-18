@@ -5,10 +5,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.model.StudentProjection;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
@@ -138,5 +140,32 @@ public class StudentController {
     public ResponseEntity<Void> assignFaculty(@PathVariable Long studentId, @PathVariable Long facultyId) {
         studentService.assignFacultyToStudent(studentId, facultyId);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * @return статус 200, количество студентов
+     */
+    @GetMapping("/count")
+    @Operation(summary = "SQL запрос - получение количества студентов школы")
+    public ResponseEntity<Long> countStudents() {
+        return ResponseEntity.ok(studentService.countAllStudents());
+    }
+
+    /**
+     * @return статус 200, средний возраст студентов
+     */
+    @GetMapping("/average-age")
+    @Operation(summary = "SQL запрос - получение среднего возраста студентов")
+    public ResponseEntity<Double> AverageAge() {
+        return ResponseEntity.ok(studentService.getAverageAge());
+    }
+
+    /**
+     * @return статус 200, последние 5 студентов по идентификатору
+     */
+    @GetMapping("/last-five")
+    @Operation (summary = "SQL запрос - получение последних 5 студентов по идентификатору")
+    public ResponseEntity<Page<StudentProjection>> lastFiveStudents() {
+        return ResponseEntity.ok(studentService.findLastFiveStudents());
     }
 }
