@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
-public class StudentControllerTest {
+public class StudentControllerWebMvcTest {
     final String name = "Oleg";
     final int age = 18;
     final long id = 1L;

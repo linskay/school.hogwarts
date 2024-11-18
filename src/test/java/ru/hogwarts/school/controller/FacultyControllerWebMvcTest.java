@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
-public class FacultyControllerTest {
+public class FacultyControllerWebMvcTest {
     final long id = 1L;
     final String name = "Java";
     final String color = "Black";
