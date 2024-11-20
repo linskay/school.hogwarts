@@ -27,6 +27,7 @@ public class Student {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Avatar avatar;
 
     public Student(int age, String name, Faculty faculty, Avatar avatar) {

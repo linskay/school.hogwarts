@@ -15,3 +15,10 @@ where age < id;
 select *
 from student
 order by age;
+select count(*)
+from student;
+select avg(age) as age
+from student;
+select *
+from student
+limit 5;
