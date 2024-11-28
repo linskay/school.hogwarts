@@ -1,5 +1,5 @@
 select *
-from student;
+from public.student;
 select *
 from student
 where age > 14

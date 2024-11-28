@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@RestController
+@RestController //todo tests
 @RequestMapping("/avatar")
 @Tag(name = "Контроллер аватаров", description = "Контроллеры для работы с аватарами студентов")
 public class AvatarController {
