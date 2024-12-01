@@ -34,4 +34,3 @@ public class AppConfig {
                 .build();
     }
 }
-

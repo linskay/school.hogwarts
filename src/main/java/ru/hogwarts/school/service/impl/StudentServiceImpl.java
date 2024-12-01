@@ -1,6 +1,8 @@
 package ru.hogwarts.school.service.impl;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.util.Optional;
 @Service
 public class StudentServiceImpl implements StudentService {
 
+    private final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
 
@@ -29,18 +32,31 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student createStudent(Student student) {
+        logger.info("Вызван метод createStudent");
+        logger.debug("Создаваемый студент: {}", student);
         return studentRepository.save(student);
     }
 
     @Override
     public Student findStudent(long id) {
-        return studentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Student.class, id));
+        logger.info("Вызван метод findStudent с id: {}", id);
+        try {
+            return studentRepository.findById(id).orElseThrow(() -> {
+                logger.error("Студент с id {} не найден", id);
+                return new NotFoundException(Student.class, id);
+            });
+        } catch (NotFoundException e) {
+            logger.warn("Студент с id {} не найден", id, e);
+            throw e;
+        }
     }
 
     @Override
     public Student editStudent(Student student) {
+        logger.info("Вызван метод editStudent с id: {}", student.getId());
+        logger.debug("Изменяемый студент: {}", student);
         if (!studentRepository.existsById(student.getId())) {
+            logger.error("Студент с id {} не найден", student.getId());
             throw new NotFoundException(Student.class, student.getId());
         }
         return studentRepository.save(student);
@@ -48,30 +64,51 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void deleteStudent(long id) {
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Student.class, id));
-        studentRepository.deleteById(student.getId());
+        logger.info("Вызван метод deleteStudent с id: {}", id);
+        try {
+            Student student = studentRepository.findById(id).orElseThrow(() -> {
+                logger.error("Студент с id {} не найден", id);
+                return new NotFoundException(Student.class, id);
+            });
+            studentRepository.deleteById(student.getId());
+            logger.debug("Студент с id {} успешно удален", id);
+        } catch (NotFoundException e) {
+            logger.warn("Студент с id {} не найден", id, e);
+            throw e;
+        }
     }
 
     @Override
     public List<Student> findByAgeBetween(int minAge, int maxAge) {
+        logger.info("Вызван метод findByAgeBetween с minAge: {}, maxAge: {}", minAge, maxAge);
         return studentRepository.findByAgeBetween(minAge, maxAge);
     }
 
     @Override
     public List<Student> findAllStudent() {
+        logger.info("Вызван метод findAllStudent");
         return studentRepository.findAll();
     }
 
     @Override
     public Faculty getFacultyByStudentId(Long id) {
-        Optional<Student> student = studentRepository.findById(id);
-        return student.map(Student::getFaculty)
-                .orElseThrow(() -> new NotFoundException(Student.class, id));
+        logger.info("Вызван метод getFacultyByStudentId с id: {}", id);
+        try {
+            return studentRepository.findById(id)
+                    .map(Student::getFaculty)
+                    .orElseThrow(() -> {
+                        logger.error("Студент с id {} не найден", id);
+                        return new NotFoundException(Student.class, id);
+                    });
+        } catch (NotFoundException e) {
+            logger.warn("Студент с id {} не найден", id, e);
+            throw e;
+        }
     }
 
     @Override
     public Student assignFacultyToStudent(Long studentId, Long facultyId) {
+        logger.info("Вызван метод assignFacultyToStudent, studentId: {}, facultyId: {}", studentId, facultyId);
         Optional<Student> student = studentRepository.findById(studentId);
         Optional<Faculty> faculty = facultyRepository.findById(facultyId);
 
@@ -89,17 +126,20 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public long countAllStudents() {
+        logger.info("Вызван метод countAllStudents");
         return studentRepository.countAllStudents();
     }
 
     @Override
     public Double getAverageAge() {
+        logger.info("Вызван метод getAverageAge");
         return studentRepository.getAverageAge();
     }
 
     @Transactional
     @Override
     public Page<StudentProjection> findLastFiveStudents() {
+        logger.info("Вызван метод findLastFiveStudents");
         Pageable pageable = PageRequest.of(0, 5);
         return studentRepository.findLastFiveStudents(pageable);
     }
