@@ -19,7 +19,7 @@ import java.nio.file.Path;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
-@Service
+@Service //todo tests
 @Transactional
 public class AvatarServiceImpl implements AvatarService {
 

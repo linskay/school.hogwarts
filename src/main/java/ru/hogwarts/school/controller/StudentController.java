@@ -126,7 +126,7 @@ public class StudentController {
      * @return статус 200 ок
      */
 
-    @PutMapping("/{studentId}/faculty/{facultyId}")
+    @PutMapping("/{studentId}/faculty/{facultyId}") //todo test
     @Operation(summary = "Назначить факультет студенту",
             description = "Присваивает указанный факультет студенту по их ID.",
             parameters = {
@@ -145,7 +145,7 @@ public class StudentController {
     /**
      * @return статус 200, количество студентов
      */
-    @GetMapping("/count")
+    @GetMapping("/count") //todo test
     @Operation(summary = "SQL запрос - получение количества студентов школы")
     public ResponseEntity<Long> countStudents() {
         return ResponseEntity.ok(studentService.countAllStudents());
@@ -154,7 +154,7 @@ public class StudentController {
     /**
      * @return статус 200, средний возраст студентов
      */
-    @GetMapping("/average-age")
+    @GetMapping("/average-age") //todo test
     @Operation(summary = "SQL запрос - получение среднего возраста студентов")
     public ResponseEntity<Double> AverageAge() {
         return ResponseEntity.ok(studentService.getAverageAge());
@@ -163,7 +163,7 @@ public class StudentController {
     /**
      * @return статус 200, последние 5 студентов по идентификатору
      */
-    @GetMapping("/last-five")
+    @GetMapping("/last-five") //todo test
     @Operation (summary = "SQL запрос - получение последних 5 студентов по идентификатору")
     public ResponseEntity<Page<StudentProjection>> lastFiveStudents() {
         return ResponseEntity.ok(studentService.findLastFiveStudents());

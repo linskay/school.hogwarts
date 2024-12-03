@@ -2,7 +2,11 @@ package ru.hogwarts.school.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "avatar")
 public class Avatar {
@@ -34,53 +38,5 @@ public class Avatar {
     }
 
     public Avatar() {
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
-
-    public void setData(byte[] bytes) {
-        this.data = bytes;
-    }
-
-    public void setMediaType(String contentType) {
-        this.mediaType = contentType;
-    }
-
-    public void setFilePath(String string) {
-        this.filePath = string;
-    }
-
-    public void setFileSize(long size) {
-        this.fileSize = size;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public long getFileSize() {
-        return fileSize;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public String getMediaType() {
-        return mediaType;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 }
