@@ -9,22 +9,18 @@ import lombok.Setter;
 import java.util.Collection;
 import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "faculty")
 public class Faculty {
 
-    @Setter
-    @Getter
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
-    @Getter
     private String name;
-    @Setter
-    @Getter
     private String color;
 
     @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
