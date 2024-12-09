@@ -20,7 +20,7 @@ public class AppConfig {
     public GroupedOpenApi getStudentGroup() {
         return GroupedOpenApi.builder()
                 .displayName("student")
-                .pathsToMatch("/student/**")
+                .pathsToMatch("/students/**")
                 .group("student")
                 .build();
     }

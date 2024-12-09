@@ -143,4 +143,32 @@ public class StudentServiceImpl implements StudentService {
         Pageable pageable = PageRequest.of(0, 5);
         return studentRepository.findLastFiveStudents(pageable);
     }
+
+    @Override
+    public void printParallel() {
+        List<Student> listParallel = studentRepository.findAll().stream()
+                .limit(6)
+                .toList();
+
+        System.out.println(listParallel.get(0));
+        System.out.println(listParallel.get(1));
+
+        Thread t1 = new Thread(() -> {
+            printParallelStudent(listParallel, 2, 3);
+        });
+
+        Thread t2 = new Thread(() -> {
+            printParallelStudent(listParallel, 4, 5);
+        });
+
+        t1.start();
+        t2.start();
+    }
+
+    private void printParallelStudent(List<Student> listParallel, int a, int b) {
+        synchronized (this) {
+            System.out.println(listParallel.get(a));
+            System.out.println(listParallel.get(b));
+        }
+    }
 }
