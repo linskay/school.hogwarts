@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.model.StudentProjection;
+import ru.hogwarts.school.repositories.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
@@ -21,18 +22,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import static java.util.stream.StreamSupport.stream;
-
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/students")
 @Tag(name = "Контроллер студентов", description = "Контроллеры для управления методами класса студент")
 public class StudentController {
 
     private static final Logger log = LoggerFactory.getLogger(StudentController.class);
     private final StudentService studentService;
+    private final StudentRepository studentRepository;
 
-    public StudentController(StudentService studentService) {
+    public StudentController(StudentService studentService, StudentRepository studentRepository) {
         this.studentService = studentService;
+        this.studentRepository = studentRepository;
     }
 
     private static String apply(Student student) {
@@ -209,25 +210,20 @@ public class StudentController {
                 .orElse(0);
     }
 
-    @GetMapping("/sumParallel")
-    public long calculateSumParallel() {
-        long startTime = System.nanoTime();
-        long sum = LongStream.rangeClosed(1, 1_000_000)
+    @GetMapping("/sum")
+    public long calculateSum() {
+        return LongStream.rangeClosed(1, 1_000_000)
                 .parallel()
                 .sum();
-        long endTime = System.nanoTime();
-        long duration = endTime - startTime;
-        log.info("Parallel sum calculated in {} ns", duration);
-        return sum; //Parallel sum calculated in 4712800 ns
     }
 
-    @GetMapping("/sumSequential")
-    public long calculateSumSequential() {
-        long startTime = System.nanoTime();
-        long n = 1_000_000;
-        long endTime = System.nanoTime();
-        long duration = endTime - startTime;
-        log.info("Sequential sum calculated in {} ns", duration);
-        return n * (n + 1) / 2; // Sequential sum calculated in 400 ns
+    @GetMapping("/print-parallel")
+    public void printParallel() {
+        studentService.printParallel();
+    }
+
+    @GetMapping("/print-synchronized")
+    public void printSynchronized() {
+        studentService.printSynchronized();
     }
 }
