@@ -18,6 +18,8 @@ import ru.hogwarts.school.service.StudentService;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class StudentServiceImpl implements StudentService {
 
@@ -146,29 +148,52 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void printParallel() {
-        List<Student> listParallel = studentRepository.findAll().stream()
+        List<Student> students = studentRepository.findAll().stream()
                 .limit(6)
                 .toList();
 
-        System.out.println(listParallel.get(0));
-        System.out.println(listParallel.get(1));
+        System.out.println(students.get(0));
+        System.out.println(students.get(1));
+
+        Thread parallell1 = new Thread(() -> {
+            System.out.println(students.get(2));
+            System.out.println(students.get(3));
+        });
+
+        Thread parallell2 = new Thread(() -> {
+            System.out.println(students.get(4));
+            System.out.println(students.get(5));
+        });
+
+        parallell1.start();
+        parallell2.start();
+    }
+
+    @Override
+    public void printSynchronized() {
+        List<Student> listSynchronized = studentRepository.findAll().stream()
+                .limit(6)
+                .toList();
+
+        System.out.println(listSynchronized.get(0));
+        System.out.println(listSynchronized.get(1));
 
         Thread t1 = new Thread(() -> {
-            printParallelStudent(listParallel, 2, 3);
+            printSynchronizedStudent(listSynchronized, 2, 3);
         });
 
         Thread t2 = new Thread(() -> {
-            printParallelStudent(listParallel, 4, 5);
+            printSynchronizedStudent(listSynchronized, 4, 5);
         });
 
         t1.start();
         t2.start();
     }
 
-    private void printParallelStudent(List<Student> listParallel, int a, int b) {
+    private void printSynchronizedStudent(List<Student> listSynchronized, int a, int b) {
         synchronized (this) {
-            System.out.println(listParallel.get(a));
-            System.out.println(listParallel.get(b));
+            System.out.println(listSynchronized.get(a));
+            System.out.println(listSynchronized.get(b));
         }
     }
 }

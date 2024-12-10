@@ -31,4 +31,6 @@ public interface StudentService {
     Page<StudentProjection> findLastFiveStudents();
 
     void printParallel();
+
+    void printSynchronized();
 }
